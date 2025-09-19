@@ -166,12 +166,20 @@ const FlowBuilder = () => {
         x: e.clientX - node.position.x,
         y: e.clientY - node.position.y,
       });
+
+      // Change cursor on body
+      document.body.style.cursor = "grabbing";
+    };
+
+    const handleMouseUp = () => {
+      setDraggingNodeId(null);
+      document.body.style.cursor = "default";
     };
 
     return (
       <div
         onMouseDown={handleMouseDown}
-        className={`absolute border border-border rounded-lg p-4 shadow-sm cursor-move min-w-[120px] ${getNodeStyle()}`}
+        className={`absolute border border-border rounded-lg p-4 shadow-sm cursor-grab min-w-[120px] ${getNodeStyle()}`}
         style={{
           left: node.position.x,
           top: node.position.y,
@@ -361,7 +369,10 @@ const FlowBuilder = () => {
                 )
               );
             }}
-            onMouseUp={() => setDraggingNodeId(null)}
+            onMouseUp={() => {
+              setDraggingNodeId(null);
+              document.body.style.cursor = "default";
+            }}
           >
             {nodes.map((node) => (
               <NodeComponent key={node.id} node={node} />
