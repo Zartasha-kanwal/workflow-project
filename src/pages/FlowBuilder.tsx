@@ -551,7 +551,6 @@ function FlowCanvas() {
           {nodes.length === 0 && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div className="text-center text-gray-400">
-                <div className="text-lg mb-2">🎯</div>
                 <div className="text-sm font-medium">
                   Start building your flow
                 </div>
@@ -589,11 +588,6 @@ function FlowCanvas() {
           </Button>
         </div>
 
-        {nodes.length > 0 && (
-          <div className="text-xs text-gray-500">
-            Last modified: {new Date().toLocaleTimeString()}
-          </div>
-        )}
       </div>
     </div>
   );
