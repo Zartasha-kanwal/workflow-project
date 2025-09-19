@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Workflows from "./pages/Workflows";
-import FlowBuilder from "./pages/FlowBuilder";
+import { FlowBuilder } from "./pages/FlowBuilder";
 import Templates from "./pages/Templates";
 import NotFound from "./pages/NotFound";
 
