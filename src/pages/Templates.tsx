@@ -1,241 +1,466 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Star, Users, Mail, MessageSquare, Calendar, Target } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "@/hooks/use-toast";
+"use client"
 
-const Templates = () => {
-  const navigate = useNavigate();
+import { useState } from "react"
+import { ArrowLeft, Search, Eye, Copy } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Card, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { FlowBuilder } from "./FlowBuilder"
+import { useNavigate } from "react-router-dom"
 
-  const templates = [
-    {
-      id: 1,
-      title: "Welcome Email Series",
-      description: "Automatically send a series of welcome emails to new subscribers",
-      category: "Email Marketing",
-      icon: Mail,
-      rating: 4.8,
-      uses: 1240,
-      nodes: [
-        { type: "trigger", title: "New Subscriber" },
-        { type: "delay", title: "Wait 1 day" },
-        { type: "email", title: "Welcome Email" },
-        { type: "delay", title: "Wait 3 days" },
-        { type: "email", title: "Getting Started Tips" }
-      ]
-    },
-    {
-      id: 2,
-      title: "Lead Nurturing Campaign",
-      description: "Nurture leads through targeted content and follow-ups",
-      category: "Lead Generation",
-      icon: Target,
-      rating: 4.9,
-      uses: 890,
-      nodes: [
-        { type: "trigger", title: "Lead Form Submit" },
-        { type: "email", title: "Thank You Email" },
-        { type: "delay", title: "Wait 2 days" },
-        { type: "condition", title: "Email Opened?" },
-        { type: "email", title: "Follow-up Email" }
-      ]
-    },
-    {
-      id: 3,
-      title: "Customer Onboarding",
-      description: "Guide new customers through your product or service",
-      category: "Customer Success",
-      icon: Users,
-      rating: 4.7,
-      uses: 650,
-      nodes: [
-        { type: "trigger", title: "New Customer" },
-        { type: "email", title: "Welcome & Setup Guide" },
-        { type: "task", title: "Schedule Onboarding Call" },
-        { type: "delay", title: "Wait 7 days" },
-        { type: "sms", title: "Check-in Message" }
-      ]
-    },
-    {
-      id: 4,
-      title: "Event Registration Follow-up",
-      description: "Manage event registrations and send reminders",
-      category: "Event Management",
-      icon: Calendar,
-      rating: 4.6,
-      uses: 420,
-      nodes: [
-        { type: "trigger", title: "Event Registration" },
-        { type: "email", title: "Confirmation Email" },
-        { type: "delay", title: "Wait 1 week before event" },
-        { type: "email", title: "Event Reminder" },
-        { type: "delay", title: "Wait 1 day after event" },
-        { type: "email", title: "Thank You & Feedback" }
-      ]
-    },
-    {
-      id: 5,
-      title: "Re-engagement Campaign",
-      description: "Win back inactive customers with targeted messaging",
-      category: "Customer Retention",
-      icon: MessageSquare,
-      rating: 4.5,
-      uses: 780,
-      nodes: [
-        { type: "trigger", title: "Inactive Customer" },
-        { type: "email", title: "We Miss You Email" },
-        { type: "delay", title: "Wait 5 days" },
-        { type: "condition", title: "Email Opened?" },
-        { type: "email", title: "Special Offer" },
-        { type: "sms", title: "Final Attempt" }
-      ]
-    },
-    {
-      id: 6,
-      title: "Product Demo Request",
-      description: "Automate demo scheduling and follow-up process",
-      category: "Sales",
-      icon: Target,
-      rating: 4.8,
-      uses: 550,
-      nodes: [
-        { type: "trigger", title: "Demo Request" },
-        { type: "email", title: "Demo Confirmation" },
-        { type: "task", title: "Schedule Demo" },
-        { type: "delay", title: "Wait 1 day after demo" },
-        { type: "email", title: "Demo Follow-up" }
-      ]
-    }
-  ];
+interface Template {
+  id: number
+  title: string
+  description: string
+  category: string
+  duration: string
+  steps: number
+  connections: number
+  categoryColor: string
+  flowData?: {
+    nodes: any[]
+    edges: any[]
+  }
+}
 
-  const handleUseTemplate = (template: any) => {
-    toast({
-      title: "Template Loaded",
-      description: `${template.title} template has been loaded in the flow builder.`,
-    });
-    
-    // Navigate to flow builder with template data
-    navigate('/flow-builder', { state: { template } });
-  };
+const allTemplates: Template[] = [
+  {
+    id: 1,
+    title: "Welcome Email Series",
+    description: "A 5-email welcome sequence for new subscribers",
+    category: "onboarding",
+    duration: "7 days",
+    steps: 4,
+    connections: 3,
+    categoryColor: "bg-orange-100 text-orange-800",
+    flowData: {
+      nodes: [
+        {
+          id: "trigger-1",
+          type: "trigger",
+          position: { x: 250, y: 50 },
+          data: {
+            label: "New Subscriber",
+            description: "User signs up",
+            icon: "⚡",
+            color: "text-orange-500",
+          },
+        },
+        {
+          id: "email-1",
+          type: "custom",
+          position: { x: 250, y: 150 },
+          data: {
+            label: "Welcome Email",
+            description: "Send welcome message",
+            icon: "✉️",
+            color: "text-purple-500",
+          },
+        },
+        {
+          id: "delay-1",
+          type: "custom",
+          position: { x: 250, y: 250 },
+          data: {
+            label: "Wait 1 Day",
+            description: "Delay before next email",
+            icon: "⏰",
+            color: "text-purple-500",
+          },
+        },
+        {
+          id: "email-2",
+          type: "custom",
+          position: { x: 250, y: 350 },
+          data: {
+            label: "Getting Started",
+            description: "Help users get started",
+            icon: "✉️",
+            color: "text-purple-500",
+          },
+        },
+      ],
+      edges: [
+        {
+          id: "e1-2",
+          source: "trigger-1",
+          target: "email-1",
+          type: "smoothstep",
+          animated: true,
+        },
+        {
+          id: "e2-3",
+          source: "email-1",
+          target: "delay-1",
+          type: "smoothstep",
+          animated: true,
+        },
+        {
+          id: "e3-4",
+          source: "delay-1",
+          target: "email-2",
+          type: "smoothstep",
+          animated: true,
+        },
+      ],
+    },
+  },
+  {
+    id: 2,
+    title: "Lead Nurturing Campaign",
+    description: "Convert leads to customers with targeted content",
+    category: "nurturing",
+    duration: "14 days",
+    steps: 4,
+    connections: 3,
+    categoryColor: "bg-green-100 text-green-800",
+    flowData: {
+      nodes: [
+        {
+          id: "trigger-2",
+          type: "trigger",
+          position: { x: 250, y: 50 },
+          data: {
+            label: "Lead Captured",
+            description: "New lead enters system",
+            icon: "⚡",
+            color: "text-orange-500",
+          },
+        },
+        {
+          id: "condition-1",
+          type: "condition",
+          position: { x: 250, y: 150 },
+          data: {
+            label: "Lead Score Check",
+            description: "Check lead quality",
+            icon: "🔀",
+            color: "text-blue-500",
+          },
+        },
+        {
+          id: "email-3",
+          type: "custom",
+          position: { x: 150, y: 280 },
+          data: {
+            label: "High Value Content",
+            description: "Send premium content",
+            icon: "✉️",
+            color: "text-purple-500",
+          },
+        },
+        {
+          id: "email-4",
+          type: "custom",
+          position: { x: 350, y: 280 },
+          data: {
+            label: "Basic Content",
+            description: "Send introductory content",
+            icon: "✉️",
+            color: "text-purple-500",
+          },
+        },
+      ],
+      edges: [
+        {
+          id: "e1-2",
+          source: "trigger-2",
+          target: "condition-1",
+          type: "smoothstep",
+          animated: true,
+        },
+        {
+          id: "e2-3",
+          source: "condition-1",
+          target: "email-3",
+          sourceHandle: "yes",
+          type: "smoothstep",
+          animated: true,
+        },
+        {
+          id: "e2-4",
+          source: "condition-1",
+          target: "email-4",
+          sourceHandle: "no",
+          type: "smoothstep",
+          animated: true,
+        },
+      ],
+    },
+  },
+  {
+    id: 3,
+    title: "Abandoned Cart Recovery",
+    description: "Win back customers who left items in their cart",
+    category: "retention",
+    duration: "3 days",
+    steps: 5,
+    connections: 4,
+    categoryColor: "bg-red-100 text-red-800",
+    flowData: {
+      nodes: [
+        {
+          id: "trigger-3",
+          type: "trigger",
+          position: { x: 250, y: 50 },
+          data: {
+            label: "Cart Abandoned",
+            description: "User leaves items in cart",
+            icon: "⚡",
+            color: "text-orange-500",
+          },
+        },
+        {
+          id: "delay-2",
+          type: "custom",
+          position: { x: 250, y: 150 },
+          data: {
+            label: "Wait 1 Hour",
+            description: "Give user time to return",
+            icon: "⏰",
+            color: "text-purple-500",
+          },
+        },
+        {
+          id: "email-5",
+          type: "custom",
+          position: { x: 250, y: 250 },
+          data: {
+            label: "Reminder Email",
+            description: "Remind about cart items",
+            icon: "✉️",
+            color: "text-purple-500",
+          },
+        },
+        {
+          id: "delay-3",
+          type: "custom",
+          position: { x: 250, y: 350 },
+          data: {
+            label: "Wait 24 Hours",
+            description: "Wait before discount offer",
+            icon: "⏰",
+            color: "text-purple-500",
+          },
+        },
+        {
+          id: "email-6",
+          type: "custom",
+          position: { x: 250, y: 450 },
+          data: {
+            label: "Discount Offer",
+            description: "Send discount to recover sale",
+            icon: "✉️",
+            color: "text-purple-500",
+          },
+        },
+      ],
+      edges: [
+        {
+          id: "e1-2",
+          source: "trigger-3",
+          target: "delay-2",
+          type: "smoothstep",
+          animated: true,
+        },
+        {
+          id: "e2-3",
+          source: "delay-2",
+          target: "email-5",
+          type: "smoothstep",
+          animated: true,
+        },
+        {
+          id: "e3-4",
+          source: "email-5",
+          target: "delay-3",
+          type: "smoothstep",
+          animated: true,
+        },
+        {
+          id: "e4-5",
+          source: "delay-3",
+          target: "email-6",
+          type: "smoothstep",
+          animated: true,
+        },
+      ],
+    },
+  },
+]
+
+const filterTabs = ["All", "Email", "Nurturing", "Onboarding", "Retention"]
+
+export default function Template() {
+  const [activeFilter, setActiveFilter] = useState("All")
+  const [searchQuery, setSearchQuery] = useState("")
+  const [currentView, setCurrentView] = useState<"library" | "builder">("library")
+  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null)
+  const navigate = useNavigate()
+
+  const filteredTemplates = allTemplates.filter((template) => {
+    const matchesFilter =
+      activeFilter === "All" ||
+      template.category.toLowerCase() === activeFilter.toLowerCase() ||
+      (activeFilter === "Email" && false) || // No email templates
+      (activeFilter === "Nurturing" && template.category === "nurturing") ||
+      (activeFilter === "Onboarding" && template.category === "onboarding") ||
+      (activeFilter === "Retention" && template.category === "retention")
+
+    const matchesSearch =
+      template.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      template.description.toLowerCase().includes(searchQuery.toLowerCase())
+
+    return matchesFilter && matchesSearch
+  })
+
+  const handleUseTemplate = (template: Template) => {
+    setSelectedTemplate(template)
+    setCurrentView("builder")
+  }
+
+  const handleBackToLibrary = () => {
+    setCurrentView("library")
+    setSelectedTemplate(null)
+  }
+
+  if (currentView === "builder" && selectedTemplate) {
+    return (
+      <div className="h-screen">
+        <FlowBuilder initialTemplate={selectedTemplate} onBack={handleBackToLibrary} />
+      </div>
+    )
+  }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
-          <Button 
-            variant="ghost" 
-            onClick={() => navigate('/workflows')}
-            className="gap-2"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Workflows
-          </Button>
-          <div>
-            <h1 className="text-4xl font-bold text-foreground">Workflow Templates</h1>
-            <p className="text-lg text-muted-foreground mt-2">
-              Get started quickly with pre-built workflow templates
-            </p>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center gap-6">
+           <Button
+  variant="ghost"
+  size="sm"
+  className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
+  onClick={() => navigate("/")}
+>
+  <ArrowLeft className="w-4 h-4" />
+  <span className="text-sm font-medium">Back to Dashboard</span>
+</Button>
+            <div className="flex items-center gap-2 text-gray-400">
+              <Copy className="w-4 h-4" />
+              <span className="text-sm">Template Library</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* Title Section */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Template Library</h1>
+          <p className="text-gray-600">Start with proven marketing flows</p>
+        </div>
+
+        {/* Search and Filters */}
+        <div className="mb-8">
+          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Input
+                placeholder="Search templates..."
+                className="pl-10 bg-white border-gray-300"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+
+            <div className="flex gap-2">
+              {filterTabs.map((tab) => (
+                <Button
+                  key={tab}
+                  variant={activeFilter === tab ? "default" : "ghost"}
+                  size="sm"
+                  className={
+                    activeFilter === tab
+                      ? "bg-gray-900 text-white hover:bg-gray-800"
+                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                  }
+                  onClick={() => setActiveFilter(tab)}
+                >
+                  {tab}
+                </Button>
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Templates Grid */}
+        {/* Template Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {templates.map((template) => {
-            const IconComponent = template.icon;
-            return (
-              <Card key={template.id} className="hover:shadow-lg transition-shadow cursor-pointer group">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-primary/10 rounded-lg">
-                        <IconComponent className="h-5 w-5 text-primary" />
+          {filteredTemplates.length === 0 ? (
+            <div className="col-span-full text-center py-12">
+              <div className="text-gray-400 mb-2">
+                <Copy className="w-12 h-12 mx-auto mb-4" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No templates found</h3>
+              <p className="text-gray-600">
+                {activeFilter === "Email"
+                  ? "No email templates are currently available."
+                  : "Try adjusting your search or filter criteria."}
+              </p>
+            </div>
+          ) : (
+            filteredTemplates.map((template) => (
+              <Card key={template.id} className="bg-white border border-gray-200 hover:shadow-md transition-shadow">
+                <CardContent className="p-6">
+                  {/* Category Badge and Duration */}
+                  <div className="flex items-center justify-between mb-4">
+                    <Badge className={`${template.categoryColor} border-0 text-xs font-medium px-2 py-1`}>
+                      {template.category}
+                    </Badge>
+                    <div className="flex items-center gap-1 text-gray-500 text-sm">
+                      <div className="w-4 h-4 rounded-full border border-gray-300 flex items-center justify-center">
+                        <div className="w-2 h-2 rounded-full bg-gray-400"></div>
                       </div>
-                      <div>
-                        <CardTitle className="text-lg">{template.title}</CardTitle>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className="text-xs bg-secondary text-secondary-foreground px-2 py-1 rounded-full">
-                            {template.category}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <CardDescription className="mt-2">
-                    {template.description}
-                  </CardDescription>
-                </CardHeader>
-                
-                <CardContent>
-                  {/* Stats */}
-                  <div className="flex items-center gap-4 mb-4 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-1">
-                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                      <span>{template.rating}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Users className="h-4 w-4" />
-                      <span>{template.uses} uses</span>
+                      <span>{template.duration}</span>
                     </div>
                   </div>
 
-                  {/* Flow Preview */}
+                  {/* Title and Description */}
                   <div className="mb-4">
-                    <h4 className="text-sm font-medium mb-2">Flow Steps:</h4>
-                    <div className="space-y-1">
-                      {template.nodes.slice(0, 3).map((node, index) => (
-                        <div key={index} className="flex items-center gap-2 text-xs">
-                          <div className="w-2 h-2 bg-primary rounded-full"></div>
-                          <span className="text-muted-foreground">{node.title}</span>
-                        </div>
-                      ))}
-                      {template.nodes.length > 3 && (
-                        <div className="flex items-center gap-2 text-xs">
-                          <div className="w-2 h-2 bg-muted-foreground rounded-full"></div>
-                          <span className="text-muted-foreground">
-                            +{template.nodes.length - 3} more steps
-                          </span>
-                        </div>
-                      )}
-                    </div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">{template.title}</h3>
+                    <p className="text-gray-600 text-sm leading-relaxed">{template.description}</p>
                   </div>
 
-                  <Button 
-                    onClick={() => handleUseTemplate(template)}
-                    className="w-full group-hover:bg-primary/90"
-                  >
-                    Use This Template
-                  </Button>
+                  {/* Stats */}
+                  <div className="flex items-center justify-between mb-6 text-sm text-gray-600">
+                    <span>{template.steps} steps</span>
+                    <span>{template.connections} connections</span>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex items-center gap-2">
+                    <Button
+                      className="flex-1 bg-gray-900 text-white hover:bg-gray-800"
+                      onClick={() => handleUseTemplate(template)}
+                    >
+                      <Copy className="w-4 h-4 mr-2" />
+                      Use Template
+                    </Button>
+                    <Button variant="ghost" size="icon" className="text-gray-600 hover:text-gray-900 hover:bg-gray-100">
+                      <Eye className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
-            );
-          })}
-        </div>
-
-        {/* Custom Template CTA */}
-        <div className="mt-12 text-center">
-          <Card className="max-w-2xl mx-auto">
-            <CardContent className="pt-6">
-              <div className="mb-4">
-                <h3 className="text-xl font-semibold mb-2">Need a Custom Template?</h3>
-                <p className="text-muted-foreground">
-                  Can't find what you're looking for? Create your own workflow from scratch.
-                </p>
-              </div>
-              <Button 
-                onClick={() => navigate('/flow-builder')}
-                variant="outline" 
-                className="gap-2"
-              >
-                <Target className="h-4 w-4" />
-                Create Custom Workflow
-              </Button>
-            </CardContent>
-          </Card>
+            ))
+          )}
         </div>
       </div>
-    </div>
-  );
-};
 
-export default Templates;
+      
+    </div>
+  )
+}

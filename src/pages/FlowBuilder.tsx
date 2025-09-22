@@ -1,14 +1,15 @@
-import React from "react";
-import { Handle, Position, MarkerType } from "@xyflow/react";
-import { useNavigate } from "react-router-dom";
-import { useCallback, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft, Download, Trash2 } from "lucide-react";
+"use client"
+
+import React from "react"
+import { Handle, Position, MarkerType } from "@xyflow/react"
+import { useNavigate } from "react-router-dom"
+import { useCallback, useRef, useState } from "react"
+import { Button } from "@/components/ui/button"
+import { ArrowLeft, Download, Trash2 } from "lucide-react"
 import {
   ReactFlow,
   MiniMap,
   Controls,
-  Background,
   useNodesState,
   useEdgesState,
   addEdge,
@@ -17,16 +18,16 @@ import {
   type Edge,
   ReactFlowProvider,
   useReactFlow,
-} from "@xyflow/react";
-import "@xyflow/react/dist/style.css";
-import { toast } from "sonner";
+} from "@xyflow/react"
+import "@xyflow/react/dist/style.css"
+import { toast } from "sonner"
 
 interface ComponentItem {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
-  color: string;
+  id: string
+  name: string
+  description: string
+  icon: string
+  color: string
 }
 
 const triggerComponents: ComponentItem[] = [
@@ -44,7 +45,7 @@ const triggerComponents: ComponentItem[] = [
     icon: "🔗",
     color: "text-purple-500",
   },
-];
+]
 
 const actionComponents: ComponentItem[] = [
   {
@@ -68,7 +69,7 @@ const actionComponents: ComponentItem[] = [
     icon: "✓",
     color: "text-green-500",
   },
-];
+]
 
 const logicComponents: ComponentItem[] = [
   {
@@ -92,13 +93,13 @@ const logicComponents: ComponentItem[] = [
     icon: "🧪",
     color: "text-green-500",
   },
-];
+]
 
 function ComponentCard({ component }: { component: ComponentItem }) {
   const onDragStart = (event: React.DragEvent, nodeType: string) => {
-    event.dataTransfer.setData("application/reactflow", nodeType);
-    event.dataTransfer.effectAllowed = "move";
-  };
+    event.dataTransfer.setData("application/reactflow", nodeType)
+    event.dataTransfer.effectAllowed = "move"
+  }
 
   return (
     <div
@@ -108,13 +109,11 @@ function ComponentCard({ component }: { component: ComponentItem }) {
     >
       <div className={`text-lg ${component.color}`}>{component.icon}</div>
       <div className="flex-1">
-        <div className="font-medium text-sm text-gray-900">
-          {component.name}
-        </div>
+        <div className="font-medium text-sm text-gray-900">{component.name}</div>
         <div className="text-xs text-gray-500">{component.description}</div>
       </div>
     </div>
-  );
+  )
 }
 
 function ComponentSection({
@@ -122,16 +121,14 @@ function ComponentSection({
   subtitle,
   components,
 }: {
-  title: string;
-  subtitle: string;
-  components: ComponentItem[];
+  title: string
+  subtitle: string
+  components: ComponentItem[]
 }) {
   return (
     <div className="mb-6">
       <div className="mb-3">
-        <h3 className="text-xs font-semibold text-gray-900 uppercase tracking-wide mb-1">
-          {title}
-        </h3>
+        <h3 className="text-xs font-semibold text-gray-900 uppercase tracking-wide mb-1">{title}</h3>
         <p className="text-xs text-gray-500">{subtitle}</p>
       </div>
       <div className="space-y-2">
@@ -140,17 +137,13 @@ function ComponentSection({
         ))}
       </div>
     </div>
-  );
+  )
 }
 
 function CustomNode({ data }: { data: any }) {
   return (
     <div className="px-4 py-2 shadow-md rounded-md bg-white border-2 border-gray-200 min-w-[150px]">
-      <Handle
-        type="target"
-        position={Position.Top}
-        className="w-3 h-3 !bg-gray-400"
-      />
+      <Handle type="target" position={Position.Top} className="w-3 h-3 !bg-gray-400" />
       <div className="flex items-center">
         <div className={`text-lg mr-2 ${data.color}`}>{data.icon}</div>
         <div>
@@ -158,13 +151,9 @@ function CustomNode({ data }: { data: any }) {
           <div className="text-xs text-gray-500">{data.description}</div>
         </div>
       </div>
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        className="w-3 h-3 !bg-gray-400"
-      />
+      <Handle type="source" position={Position.Bottom} className="w-3 h-3 !bg-gray-400" />
     </div>
-  );
+  )
 }
 
 function TriggerNode({ data }: { data: any }) {
@@ -177,23 +166,15 @@ function TriggerNode({ data }: { data: any }) {
           <div className="text-xs text-gray-500">{data.description}</div>
         </div>
       </div>
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        className="w-3 h-3 !bg-orange-400"
-      />
+      <Handle type="source" position={Position.Bottom} className="w-3 h-3 !bg-orange-400" />
     </div>
-  );
+  )
 }
 
 function ConditionNode({ data }: { data: any }) {
   return (
     <div className="px-4 py-2 shadow-md rounded-md bg-gradient-to-r from-blue-100 to-blue-50 border-2 border-blue-200 min-w-[150px]">
-      <Handle
-        type="target"
-        position={Position.Top}
-        className="w-3 h-3 !bg-blue-400"
-      />
+      <Handle type="target" position={Position.Top} className="w-3 h-3 !bg-blue-400" />
       <div className="flex items-center">
         <div className={`text-lg mr-2 ${data.color}`}>{data.icon}</div>
         <div>
@@ -220,22 +201,36 @@ function ConditionNode({ data }: { data: any }) {
         <span>No</span>
       </div>
     </div>
-  );
+  )
 }
 
 const nodeTypes = {
   custom: CustomNode,
   trigger: TriggerNode,
   condition: ConditionNode,
-};
+}
 
-function FlowCanvas() {
-  const reactFlowWrapper = useRef<HTMLDivElement>(null);
-  const [nodes, setNodes, onNodesChange] = useNodesState([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const { screenToFlowPosition, fitView, zoomIn, zoomOut } = useReactFlow();
-   const navigate = useNavigate();
+interface FlowBuilderProps {
+  initialTemplate?: {
+    id: number
+    title: string
+    flowData?: {
+      nodes: any[]
+      edges: any[]
+    }
+  }
+  onBack?: () => void
+}
+
+function FlowCanvas({ initialTemplate, onBack }: FlowBuilderProps) {
+  const reactFlowWrapper = useRef<HTMLDivElement>(null)
+
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialTemplate?.flowData?.nodes || [])
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialTemplate?.flowData?.edges || [])
+
+  const [isLoading, setIsLoading] = useState(false)
+  const { screenToFlowPosition, fitView, zoomIn, zoomOut } = useReactFlow()
+  const navigate = useNavigate()
 
   const onConnect = useCallback(
     (params: Connection) => {
@@ -249,18 +244,18 @@ function FlowCanvas() {
           type: MarkerType.ArrowClosed,
           color: "#6366f1",
         },
-      };
-      setEdges((eds) => addEdge(edge, eds));
-      toast.success("Connection created successfully!");
+      }
+      setEdges((eds) => addEdge(edge, eds))
+      toast.success("Connection created successfully!")
     },
-    [setEdges]
-  );
+    [setEdges],
+  )
 
   const isValidConnection = useCallback(
     (connection: Connection) => {
       // Prevent self-connections
       if (connection.source === connection.target) {
-        return false;
+        return false
       }
 
       // Prevent duplicate connections
@@ -269,45 +264,41 @@ function FlowCanvas() {
           edge.source === connection.source &&
           edge.target === connection.target &&
           edge.sourceHandle === connection.sourceHandle &&
-          edge.targetHandle === connection.targetHandle
-      );
+          edge.targetHandle === connection.targetHandle,
+      )
 
-      return !existingEdge;
+      return !existingEdge
     },
-    [edges]
-  );
+    [edges],
+  )
 
   const onDrop = useCallback(
     (event: React.DragEvent) => {
-      event.preventDefault();
+      event.preventDefault()
 
-      const type = event.dataTransfer.getData("application/reactflow");
+      const type = event.dataTransfer.getData("application/reactflow")
 
       if (typeof type === "undefined" || !type) {
-        return;
+        return
       }
 
       const position = screenToFlowPosition({
         x: event.clientX,
         y: event.clientY,
-      });
+      })
 
       // Find component data
-      const allComponents = [
-        ...triggerComponents,
-        ...actionComponents,
-        ...logicComponents,
-      ];
-      const componentData = allComponents.find((comp) => comp.id === type);
+      const allComponents = [...triggerComponents, ...actionComponents, ...logicComponents]
+      const componentData = allComponents.find((comp) => comp.id === type)
 
-      if (!componentData) return;
+      if (!componentData) return
 
       // Determine node type based on component
-      let nodeType = "custom";
+      let nodeType = "custom"
       if (type === "trigger" || type === "webhook") {
-        nodeType = "trigger";
+        nodeType = "trigger"
       } else if (type === "condition") {
-        nodeType = "condition";
+        nodeType = "condition"
       }
 
       const newNode: Node = {
@@ -320,26 +311,26 @@ function FlowCanvas() {
           icon: componentData.icon,
           color: componentData.color,
         },
-      };
+      }
 
-      setNodes((nds) => nds.concat(newNode));
-      toast.success(`${componentData.name} node added to flow!`);
+      setNodes((nds) => nds.concat(newNode))
+      toast.success(`${componentData.name} node added to flow!`)
     },
-    [screenToFlowPosition, setNodes]
-  );
+    [screenToFlowPosition, setNodes],
+  )
 
   const onDragOver = useCallback((event: React.DragEvent) => {
-    event.preventDefault();
-    event.dataTransfer.dropEffect = "move";
-  }, []);
+    event.preventDefault()
+    event.dataTransfer.dropEffect = "move"
+  }, [])
 
   const onSave = useCallback(async () => {
     if (nodes.length === 0) {
-      toast.error("Cannot save empty flow");
-      return;
+      toast.error("Cannot save empty flow")
+      return
     }
 
-    setIsLoading(true);
+    setIsLoading(true)
     try {
       const flow = {
         nodes,
@@ -350,38 +341,38 @@ function FlowCanvas() {
           nodeCount: nodes.length,
           connectionCount: edges.length,
         },
-      };
+      }
 
       // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000))
 
       // Store in localStorage for demo purposes
-      localStorage.setItem("marketing-flow", JSON.stringify(flow));
+      localStorage.setItem("marketing-flow", JSON.stringify(flow))
 
-      console.log("[v0] Flow saved:", flow);
-      toast.success("Flow saved successfully!");
+      console.log("[v0] Flow saved:", flow)
+      toast.success("Flow saved successfully!")
     } catch (error) {
-      toast.error("Failed to save flow");
+      toast.error("Failed to save flow")
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  }, [nodes, edges]);
+  }, [nodes, edges])
 
   const onClear = useCallback(() => {
     if (nodes.length === 0 && edges.length === 0) {
-      toast.info("Canvas is already empty");
-      return;
+      toast.info("Canvas is already empty")
+      return
     }
 
-    setNodes([]);
-    setEdges([]);
-    toast.success("Canvas cleared!");
-  }, [setNodes, setEdges, nodes.length, edges.length]);
+    setNodes([])
+    setEdges([])
+    toast.success("Canvas cleared!")
+  }, [setNodes, setEdges, nodes.length, edges.length])
 
   const onExport = useCallback(() => {
     if (nodes.length === 0) {
-      toast.error("Cannot export empty flow");
-      return;
+      toast.error("Cannot export empty flow")
+      return
     }
 
     const flow = {
@@ -393,47 +384,46 @@ function FlowCanvas() {
         nodeCount: nodes.length,
         connectionCount: edges.length,
       },
-    };
-    const dataStr = JSON.stringify(flow, null, 2);
-    const dataUri =
-      "data:application/json;charset=utf-8," + encodeURIComponent(dataStr);
+    }
+    const dataStr = JSON.stringify(flow, null, 2)
+    const dataUri = "data:application/json;charset=utf-8," + encodeURIComponent(dataStr)
 
-    const exportFileDefaultName = "marketing-flow.json";
-    const linkElement = document.createElement("a");
-    linkElement.setAttribute("href", dataUri);
-    linkElement.setAttribute("download", exportFileDefaultName);
-    linkElement.click();
+    const exportFileDefaultName = "marketing-flow.json"
+    const linkElement = document.createElement("a")
+    linkElement.setAttribute("href", dataUri)
+    linkElement.setAttribute("download", exportFileDefaultName)
+    linkElement.click()
 
-    toast.success("Flow exported successfully!");
-  }, [nodes, edges]);
+    toast.success("Flow exported successfully!")
+  }, [nodes, edges])
 
   const onKeyDown = useCallback(
     (event: KeyboardEvent) => {
       if (event.ctrlKey || event.metaKey) {
         switch (event.key) {
           case "s":
-            event.preventDefault();
-            onSave();
-            break;
+            event.preventDefault()
+            onSave()
+            break
           case "e":
-            event.preventDefault();
-            onExport();
-            break;
+            event.preventDefault()
+            onExport()
+            break
           case "Delete":
           case "Backspace":
-            event.preventDefault();
-            onClear();
-            break;
+            event.preventDefault()
+            onClear()
+            break
         }
       }
     },
-    [onSave, onExport, onClear]
-  );
+    [onSave, onExport, onClear],
+  )
 
   React.useEffect(() => {
-    document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
-  }, [onKeyDown]);
+    document.addEventListener("keydown", onKeyDown)
+    return () => document.removeEventListener("keydown", onKeyDown)
+  }, [onKeyDown])
 
   return (
     <div className="flex-1 flex flex-col">
@@ -444,11 +434,16 @@ function FlowCanvas() {
             variant="ghost"
             size="sm"
             className="text-gray-600 hover:text-gray-900"
-            onClick={() => navigate("/workflows")}
+             onClick={onBack || (() => navigate("/"))}
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Dashboard
+            Back to dashboard
           </Button>
+          {initialTemplate && (
+            <div className="text-sm text-gray-600">
+              Editing: <span className="font-medium">{initialTemplate.title}</span>
+            </div>
+          )}
         </div>
         <div className="flex items-center gap-4 text-sm text-gray-500">
           <div className="flex items-center gap-1">
@@ -469,45 +464,24 @@ function FlowCanvas() {
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-2">
               <div className="w-2 h-2 bg-black rounded-full"></div>
-              <span className="text-sm font-medium text-gray-900">
-                Flow Builder
-              </span>
+              <span className="text-sm font-medium text-gray-900">Flow Builder</span>
             </div>
-            <h1 className="text-xl font-semibold text-gray-900 mb-1">
-              New Marketing Flow
-            </h1>
+            <h1 className="text-xl font-semibold text-gray-900 mb-1">New Marketing Flow</h1>
           </div>
 
           <div className="mb-6">
-            <h2 className="text-sm font-medium text-gray-900 mb-4">
-              Drag & Drop Components
-            </h2>
+            <h2 className="text-sm font-medium text-gray-900 mb-4">Drag & Drop Components</h2>
             <p className="text-xs text-gray-500 mb-4">
-              Drag components to the canvas to build your marketing automation
-              flow.
+              Drag components to the canvas to build your marketing automation flow.
             </p>
           </div>
 
-          <ComponentSection
-            title="TRIGGERS"
-            subtitle="Start your flows"
-            components={triggerComponents}
-          />
-          <ComponentSection
-            title="ACTIONS"
-            subtitle="Marketing actions"
-            components={actionComponents}
-          />
-          <ComponentSection
-            title="LOGIC"
-            subtitle="Flow control"
-            components={logicComponents}
-          />
+          <ComponentSection title="TRIGGERS" subtitle="Start your flows" components={triggerComponents} />
+          <ComponentSection title="ACTIONS" subtitle="Marketing actions" components={actionComponents} />
+          <ComponentSection title="LOGIC" subtitle="Flow control" components={logicComponents} />
 
           <div className="mt-8 p-3 bg-gray-50 rounded-lg">
-            <h3 className="text-xs font-semibold text-gray-900 mb-2">
-              Keyboard Shortcuts
-            </h3>
+            <h3 className="text-xs font-semibold text-gray-900 mb-2">Keyboard Shortcuts</h3>
             <div className="text-xs text-gray-600 space-y-1">
               <div>Ctrl/Cmd + S: Save Flow</div>
               <div>Ctrl/Cmd + E: Export Flow</div>
@@ -541,9 +515,9 @@ function FlowCanvas() {
             <Controls />
             <MiniMap
               nodeColor={(node) => {
-                if (node.type === "trigger") return "#f97316";
-                if (node.type === "condition") return "#3b82f6";
-                return "#6b7280";
+                if (node.type === "trigger") return "#f97316"
+                if (node.type === "condition") return "#3b82f6"
+                return "#6b7280"
               }}
             />
           </ReactFlow>
@@ -551,12 +525,8 @@ function FlowCanvas() {
           {nodes.length === 0 && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div className="text-center text-gray-400">
-                <div className="text-sm font-medium">
-                  Start building your flow
-                </div>
-                <div className="text-xs">
-                  Drag components from the sidebar to get started
-                </div>
+                <div className="text-sm font-medium">Start building your flow</div>
+                <div className="text-xs">Drag components from the sidebar to get started</div>
               </div>
             </div>
           )}
@@ -566,19 +536,11 @@ function FlowCanvas() {
       {/* Bottom Action Bar */}
       <div className="bg-white border-t border-gray-200 px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Button
-            className="bg-black text-white hover:bg-gray-800"
-            onClick={onSave}
-            disabled={isLoading}
-          >
+          <Button className="bg-black text-white hover:bg-gray-800" onClick={onSave} disabled={isLoading}>
             <Download className="w-4 h-4 mr-2" />
             {isLoading ? "Saving..." : "Save Flow"}
           </Button>
-          <Button
-            variant="outline"
-            onClick={onExport}
-            disabled={nodes.length === 0}
-          >
+          <Button variant="outline" onClick={onExport} disabled={nodes.length === 0}>
             <Download className="w-4 h-4 mr-2" />
             Export
           </Button>
@@ -587,18 +549,17 @@ function FlowCanvas() {
             Clear
           </Button>
         </div>
-
       </div>
     </div>
-  );
+  )
 }
 
-export function FlowBuilder() {
+export function FlowBuilder({ initialTemplate, onBack }: FlowBuilderProps = {}) {
   return (
     <div className="h-screen bg-gray-50">
       <ReactFlowProvider>
-        <FlowCanvas />
+        <FlowCanvas initialTemplate={initialTemplate} onBack={onBack} />
       </ReactFlowProvider>
     </div>
-  );
+  )
 }
