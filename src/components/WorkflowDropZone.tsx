@@ -28,7 +28,7 @@ export const WorkflowDropZone = ({ onCreateFlow }: WorkflowDropZoneProps) => {
   return (
     <div
       className={cn(
-        "relative min-h-[200px] w-[40%] rounded-lg border-2 border-dashed transition-all duration-200 cursor-pointer",
+        "relative min-h-[200px] md:w-[40%] rounded-lg border-2 border-dashed transition-all duration-200 cursor-pointer",
         "flex flex-col items-center justify-center gap-4 p-8",
         isDragOver 
           ? "border-primary bg-workflow-hover" 

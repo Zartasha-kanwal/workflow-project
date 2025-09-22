@@ -49,10 +49,8 @@ const Workflows = () => {
     const loadFlows = () => setSavedFlows(getSavedFlows());
     loadFlows();
 
-    // Listen for flow save events
     const handleFlowSaved = () => loadFlows();
     window.addEventListener("flowSaved", handleFlowSaved);
-
     return () => window.removeEventListener("flowSaved", handleFlowSaved);
   }, []);
 
@@ -65,7 +63,6 @@ const Workflows = () => {
   };
 
   const handleEditFlow = (flow: SavedFlow) => {
-    // Navigate to flow builder with the flow data
     navigate("/flow-builder", { state: { flow } });
   };
 
@@ -83,16 +80,16 @@ const Workflows = () => {
     <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
-        <div className="flex items-start justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-foreground mb-2">
+            <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">
               Marketing Flows
             </h1>
-            <p className="text-lg text-muted-foreground">
+            <p className="text-base sm:text-lg text-muted-foreground">
               Automate your marketing with powerful workflows
             </p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
             <Button
               variant="outline"
               onClick={handleBrowseTemplates}
@@ -133,8 +130,8 @@ const Workflows = () => {
           />
         </div>
 
-        {/* Left side - Search */}
-        <div className="lg:w-1/3">
+        {/* Search */}
+        <div className="w-full lg:w-1/3 mb-6 lg:mb-0">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <Input
@@ -148,16 +145,16 @@ const Workflows = () => {
 
         <div className="flex flex-col lg:flex-row gap-8 mt-8">
           {/* Workflow Drop Zone */}
-          <WorkflowDropZone onCreateFlow={handleCreateFlow} />
+           <WorkflowDropZone onCreateFlow={handleCreateFlow} />
 
           {/* Saved Flows */}
-          <div className="lg:w-2/3">
-            <div className="flex items-center justify-between mb-4">
+          <div className="w-full lg:w-2/3">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
               <h3 className="text-lg font-semibold text-foreground">
                 Saved Flows
               </h3>
               {savedFlows.length > 0 && (
-                <Badge variant="secondary">
+                <Badge variant="secondary" className="w-fit sm:w-auto">
                   {savedFlows.length} flow{savedFlows.length !== 1 ? "s" : ""}
                 </Badge>
               )}
@@ -209,7 +206,7 @@ const Workflows = () => {
                       </div>
                     </CardHeader>
                     <CardContent className="pt-0">
-                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs text-muted-foreground">
                         <span>{flow.nodeCount} nodes</span>
                         <span>{flow.connectionCount} connections</span>
                       </div>
