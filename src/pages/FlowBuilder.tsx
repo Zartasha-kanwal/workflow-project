@@ -2,7 +2,6 @@
 
 import React from "react"
 import { Handle, Position, MarkerType } from "@xyflow/react"
-import { useNavigate } from "react-router-dom"
 import { useCallback, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, Download, Trash2 } from "lucide-react"
@@ -20,7 +19,8 @@ import {
   useReactFlow,
 } from "@xyflow/react"
 import "@xyflow/react/dist/style.css"
-import { toast } from "sonner"
+import { toast } from "@/hooks/use-toast"
+import { useNavigate } from "react-router-dom";
 
 interface ComponentItem {
   id: string
@@ -222,6 +222,24 @@ interface FlowBuilderProps {
   onBack?: () => void
 }
 
+const saveFlowToLocalStorage = (flowData: {
+  name: string
+  created: string
+  nodeCount: number
+  connectionCount: number
+  nodes: any[]
+  edges: any[]
+}) => {
+  const flows = JSON.parse(localStorage.getItem("saved-flows") || "[]")
+  const newFlow = {
+    id: `flow-${Date.now()}`,
+    ...flowData,
+  }
+  flows.push(newFlow)
+  localStorage.setItem("saved-flows", JSON.stringify(flows))
+  return newFlow
+}
+
 function FlowCanvas({ initialTemplate, onBack }: FlowBuilderProps) {
   const reactFlowWrapper = useRef<HTMLDivElement>(null)
 
@@ -229,8 +247,8 @@ function FlowCanvas({ initialTemplate, onBack }: FlowBuilderProps) {
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialTemplate?.flowData?.edges || [])
 
   const [isLoading, setIsLoading] = useState(false)
-  const { screenToFlowPosition, fitView, zoomIn, zoomOut } = useReactFlow()
-  const navigate = useNavigate()
+  const { screenToFlowPosition } = useReactFlow()
+  const navigate = useNavigate();
 
   const onConnect = useCallback(
     (params: Connection) => {
@@ -246,7 +264,10 @@ function FlowCanvas({ initialTemplate, onBack }: FlowBuilderProps) {
         },
       }
       setEdges((eds) => addEdge(edge, eds))
-      toast.success("Connection created successfully!")
+      toast({
+        title: "Connection Created",
+        description: "Connection created successfully!",
+      })
     },
     [setEdges],
   )
@@ -314,7 +335,10 @@ function FlowCanvas({ initialTemplate, onBack }: FlowBuilderProps) {
       }
 
       setNodes((nds) => nds.concat(newNode))
-      toast.success(`${componentData.name} node added to flow!`)
+      toast({
+        title: "Node Added",
+        description: `${componentData.name} node added to flow!`,
+      })
     },
     [screenToFlowPosition, setNodes],
   )
@@ -326,52 +350,70 @@ function FlowCanvas({ initialTemplate, onBack }: FlowBuilderProps) {
 
   const onSave = useCallback(async () => {
     if (nodes.length === 0) {
-      toast.error("Cannot save empty flow")
+      toast({
+        title: "Cannot Save",
+        description: "Cannot save empty flow",
+        variant: "destructive",
+      })
       return
     }
 
     setIsLoading(true)
     try {
-      const flow = {
+      const flowName = initialTemplate?.title || "New Marketing Flow"
+
+      const savedFlow = saveFlowToLocalStorage({
+        name: flowName,
+        created: new Date().toISOString(),
+        nodeCount: nodes.length,
+        connectionCount: edges.length,
         nodes,
         edges,
-        metadata: {
-          name: "New Marketing Flow",
-          created: new Date().toISOString(),
-          nodeCount: nodes.length,
-          connectionCount: edges.length,
-        },
-      }
+      })
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      console.log("[v0] Flow saved:", savedFlow)
 
-      // Store in localStorage for demo purposes
-      localStorage.setItem("marketing-flow", JSON.stringify(flow))
+      window.dispatchEvent(new CustomEvent("flowSaved"))
 
-      console.log("[v0] Flow saved:", flow)
-      toast.success("Flow saved successfully!")
+      toast({
+        title: "Flow Saved",
+        description: "Your workflow has been saved successfully and will appear in your dashboard.",
+      })
     } catch (error) {
-      toast.error("Failed to save flow")
+      toast({
+        title: "Save Failed",
+        description: "Failed to save flow",
+        variant: "destructive",
+      })
     } finally {
       setIsLoading(false)
     }
-  }, [nodes, edges])
+  }, [nodes, edges, initialTemplate?.title])
 
   const onClear = useCallback(() => {
     if (nodes.length === 0 && edges.length === 0) {
-      toast.info("Canvas is already empty")
+      toast({
+        title: "Canvas Empty",
+        description: "Canvas is already empty",
+      })
       return
     }
 
     setNodes([])
     setEdges([])
-    toast.success("Canvas cleared!")
+    toast({
+      title: "Canvas Cleared",
+      description: "Canvas cleared!",
+    })
   }, [setNodes, setEdges, nodes.length, edges.length])
 
   const onExport = useCallback(() => {
     if (nodes.length === 0) {
-      toast.error("Cannot export empty flow")
+      toast({
+        title: "Cannot Export",
+        description: "Cannot export empty flow",
+        variant: "destructive",
+      })
       return
     }
 
@@ -379,7 +421,7 @@ function FlowCanvas({ initialTemplate, onBack }: FlowBuilderProps) {
       nodes,
       edges,
       metadata: {
-        name: "New Marketing Flow",
+        name: initialTemplate?.title || "New Marketing Flow",
         exported: new Date().toISOString(),
         nodeCount: nodes.length,
         connectionCount: edges.length,
@@ -394,8 +436,11 @@ function FlowCanvas({ initialTemplate, onBack }: FlowBuilderProps) {
     linkElement.setAttribute("download", exportFileDefaultName)
     linkElement.click()
 
-    toast.success("Flow exported successfully!")
-  }, [nodes, edges])
+    toast({
+      title: "Export Complete",
+      description: "Flow exported successfully!",
+    })
+  }, [nodes, edges, initialTemplate?.title])
 
   const onKeyDown = useCallback(
     (event: KeyboardEvent) => {
@@ -431,14 +476,15 @@ function FlowCanvas({ initialTemplate, onBack }: FlowBuilderProps) {
       <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button
-            variant="ghost"
-            size="sm"
-            className="text-gray-600 hover:text-gray-900"
-             onClick={onBack || (() => navigate("/"))}
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to dashboard
-          </Button>
+  variant="ghost"
+  size="sm"
+  className="text-gray-600 hover:text-gray-900"
+  onClick={() => navigate("/")}
+>
+  <ArrowLeft className="w-4 h-4 mr-2" />
+  Back to dashboard
+</Button>
+
           {initialTemplate && (
             <div className="text-sm text-gray-600">
               Editing: <span className="font-medium">{initialTemplate.title}</span>
@@ -466,7 +512,9 @@ function FlowCanvas({ initialTemplate, onBack }: FlowBuilderProps) {
               <div className="w-2 h-2 bg-black rounded-full"></div>
               <span className="text-sm font-medium text-gray-900">Flow Builder</span>
             </div>
-            <h1 className="text-xl font-semibold text-gray-900 mb-1">New Marketing Flow</h1>
+            <h1 className="text-xl font-semibold text-gray-900 mb-1">
+              {initialTemplate?.title || "New Marketing Flow"}
+            </h1>
           </div>
 
           <div className="mb-6">
